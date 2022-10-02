@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compile Sandbox</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      body {
+        background-color: aliceblue;
+      }
+      .output {
+        font-family: monospace;
+        white-space: pre-line;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        background: #eaecef;
+        min-height: 50px;
+      }
+      .input {
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row" style="margin-top: 30px">
+      <div class="col-8 offset-2">
+        <div class="card" style="width: 100%">
+          <div class="card-body">
+            <h2>Compile Sandbox</h2>
+            <p class="card-text">
+              This is a sandbox for compiling code. It is a simple example of how to use the sandbox.
+            </p>
+
+            <div class="row g-3 align-items-center">
+              <div class="col-auto">
+                <label for="langid" class="form-label">Language</label>
+              </div>
+              <div class="col-auto">
+                <select class="form-select" id="langid">
+                  <option selected value="0">C/C++</option>
+                  <option value="1">Java</option>
+                  <option value="2">Python3</option>
+                  <option value="3">Go</option>
+                  <option value="4">JavaScript</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="codid" class="form-label">Code:</label>
+              <textarea class="form-control input" id="codeid" rows="10">
+#include<iostream>
+#include<string>
+using namespace std;
+
+int main(){
+    string s;
+    cin>>s;
+    cout<<s<<endl;
+   return 0;
+}</textarea
+              >
+            </div>
+
+            <div class="mb-3">
+              <label for="stdinid" class="form-label input">Stdin:</label>
+              <textarea class="form-control" id="stdinid" rows="3">Hello-world!</textarea>
+            </div>
+
+            <div class="mb-3">
+              <button type="button" class="btn btn-primary" id="sendid">Compile and Run</button>
+            </div>
+
+            <div class="mb-3">
+              <label id="outputlabel" for="outputid" class="form-label">Output:</label>
+              <p id="outputid" class="output form-control">Output appears here</p>
+            </div>
+
+            <hr />
+            <h2>Compile Tests</h2>
+            <p class="card-text">"Hello world!" test in all languages</p>
+
+            <div class="mb-3">
+              <button type="button" class="btn btn-primary" id="testid">Test All Languages</button>
+            </div>
+
+            <div class="mb-3">
+              <label id="alloutputlabel" for="alloutputid" class="form-label">All Output:</label>
+              <p id="alloutputid" class="output form-control">Output of all tests appear here</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script type="module">
+      import { LANGS, Codes } from '/web/langs.js';
+
+      //COMPILE USER GIVEN CODE
+      $('#sendid').click(function () {
+        $('#outputlabel').css('background', 'white');
+        const langid = $('#langid').val();
+        const code = $('#codeid').val();
+        const stdin = $('#stdinid').val();
+
+        // passing the json file to the page
+        var json = {
+          language: Number(langid),
+          code: code,
+          stdin: stdin,
+        };
+        // console.log(json);
+        $.post('/compile', json, function (data, error, xhr) {
+          document.getElementById('outputid').innerText = data.output;
+          $('#outputlabel').css('background', '#90EE90');
+          if (data.output == '') {
+            document.getElementById('outputid').innerText = data.errors;
+            $('#outputlabel').css('background', '#FF3131');
+          }
+        });
+      });
+
+      //RUN TESTS ON ALL LANGUAGES
+      var langid_to_name = [];
+
+      $('#testid').on('click', function () {
+        $('#alloutputlabel').css('background', 'white');
+        $('#alloutputlabel').html('All Output: <b>' + 0 + '/' + langid_to_name.length + '</b>');
+        $('#alloutputid').html('');
+        //send compile request for each language
+        let pass_count = 0;
+        for (var i in LANGS) {
+          var langid = LANGS[i][0];
+          var code = Codes[i];
+          langid_to_name[langid] = i;
+
+          //prepare data
+          var json = {
+            language: langid,
+            code: code,
+          };
+          // console.log(json);
+          //send post and print result
+          $.post('/compile', json, function (data, error, xhr) {
+            $('#alloutputid').append('<b>' + langid_to_name[data.langid] + '</b>:<br>' + data.output + '<br>');
+            if (data.output == '') {
+              $('#alloutputlabel').css('background', '#FF3131');
+              $('#alloutputid').append('<b>' + langid_to_name[data.langid] + '</b>:<br>' + data.errors + '<br>');
+            } else {
+              pass_count++;
+              if (pass_count >= langid_to_name.length) {
+                $('#alloutputlabel').css('background', '#90EE90');
+              }
+              $('#alloutputlabel').html('All Output: <b>' + pass_count + '/' + langid_to_name.length + '</b>');
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
