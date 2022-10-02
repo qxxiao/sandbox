@@ -14,7 +14,6 @@
 
 import { execSync, exec } from 'child_process';
 import fs from 'fs';
-import { constants } from 'fs/promises';
 
 export default class DockerSandbox {
   constructor(
@@ -61,12 +60,12 @@ export default class DockerSandbox {
   prepare() {
     try {
       fs.mkdirSync(this.path + this.folder, { mod: 0o666 });
-      fs.copyFileSync(this.path + 'payload/script.sh', this.path + this.folder + '/script.sh', constants.COPYFILE_EXCL);
+      fs.copyFileSync(this.path + 'payload/script.sh', this.path + this.folder + '/script.sh', fs.constants.COPYFILE_EXCL);
       fs.chmodSync(this.path + this.folder + '/script.sh', 0o777);
       fs.copyFileSync(
         this.path + 'payload/javaRunner.sh',
         this.path + this.folder + '/javaRunner.sh',
-        constants.COPYFILE_EXCL
+        fs.constants.COPYFILE_EXCL
       );
       fs.chmodSync(this.path + this.folder + '/javaRunner.sh', 0o777);
       fs.writeFileSync(this.path + this.folder + '/' + this.file_name, this.code, {
