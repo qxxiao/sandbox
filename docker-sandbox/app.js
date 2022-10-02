@@ -78,7 +78,7 @@ app.post('/compile', bruteforce.prevent, function (req, res) {
  *  index.html example
  */
 app.get('/', function (req, res) {
-  res.sendfile('./web/index.html');
+  res.sendFile('./web/index.html');
 });
 
 console.log('Listening at ' + port);
