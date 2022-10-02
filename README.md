@@ -5,12 +5,12 @@ CompileBox is a Docker based sandbox to run untrusted code and return the output
 ## Use
 1. use pre-built docker image   
 
-if don't install docker, just run:  
+If docker is not installed, run script and install docker and pull image:  
 ```shell
 ./install.sh
 ```
 
-or you can pull this image:  
+or you can just pull this image:  
 ```shell
 docker pull qxxiao/compile-sandbox:latest
 ```
