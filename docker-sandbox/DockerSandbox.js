@@ -116,8 +116,8 @@ export default class DockerSandbox {
         try {
           let data = fs.readFileSync(this.path + this.folder + '/completed', 'utf8');
           let error = fs.readFileSync(this.path + this.folder + '/errors', 'utf8');
-          console.log('Data:\n' + data);
-          console.log('Error:\n' + error);
+          console.log('[' + this.languageName + '] Data:\n' + data);
+          console.log('[' + this.languageName+ '] Error:\n' + error);
           let lines = data.toString().split('*-COMPILEBOX::ENDOFOUTPUT-*');
           data = lines[0];
           let time = lines[1];
