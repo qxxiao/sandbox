@@ -102,6 +102,7 @@ int main(){
       //COMPILE USER GIVEN CODE
       $('#sendid').click(function () {
         $('#outputlabel').css('background', 'white');
+        $('#outputid').html('');
         const langid = $('#langid').val();
         const code = $('#codeid').val();
         const stdin = $('#stdinid').val();
